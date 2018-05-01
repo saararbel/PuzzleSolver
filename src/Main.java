@@ -6,6 +6,9 @@ public class Main {
 	
 	
 	public static void main(String[] args) throws IOException {
-		new PuzzleBuilder().parseInputFile();
+		Puzzle puzzle = new PuzzleBuilder().parseInputFile();
+		PuzzleSolver puzzleSolver = new PuzzleSolver();
+		
+		puzzleSolver.bfs(puzzle);
 	}
 }
