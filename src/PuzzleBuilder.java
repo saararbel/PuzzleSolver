@@ -11,6 +11,65 @@ public class PuzzleBuilder {
 
 	public PuzzleBuilder() {
 	}
+	
+	private boolean searchInPositions(String[] positions, int position) {
+		for(int i=0 ; i<positions.length ; i++) {
+			if(Integer.valueOf(positions[i]) == position) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private PuzzleState buildStartState(int height, int width, String[] redPositions, String[] yellowPositions, List<String> content) {
+		int[][] boardValues = new int[height][width];
+		int[][] boardColors = new int[height][width];
+		
+		for(int i=0 ; i<content.size() ; i++) {
+			String[] lineElem = content.get(i).split(",");
+			for(int j=0 ; j < lineElem.length ; j++) {
+				if(lineElem[j].trim().contains("_")) {
+					boardValues[i][j] = -1;
+				} else {
+					boardValues[i][j] = Integer.parseInt(lineElem[j].trim());
+				}
+			}
+		}
+		
+		for(int i=0 ; i<height; i++) {
+			for(int j=0 ; j<width; j++) {
+				if(searchInPositions(redPositions, i*width + j + 1)) {
+					boardColors[i][j] = PuzzleState.RED;
+				}
+				else if(searchInPositions(yellowPositions, i*width + j + 1)) {
+					boardColors[i][j] = PuzzleState.YELLOW;
+				} 
+				else {
+					boardColors[i][j] = PuzzleState.WHITE;
+				}
+			}
+		}
+		
+		return new PuzzleState(boardValues, boardColors);
+	}
+	
+	private PuzzleState buildEndState(int height, int width) {
+		int[][] boardValues = new int[height][width];
+		
+		for(int i=0 ; i<height ; i++) {
+			for(int j=0 ; j<width; j++ ) {
+				if(i == height - 1 && j == width - 1) {
+					boardValues[i][j] = -1;
+				}
+				else {
+					boardValues[i][j] = i*width + j + 1;
+				}
+			}
+		}
+		
+		return new PuzzleState(boardValues, null);
+	}
 
 	public Puzzle parseInputFile() throws FileNotFoundException, IOException {
 		URL url = getClass().getResource("input.txt");
@@ -38,8 +97,8 @@ public class PuzzleBuilder {
 				lines.add(line);
 			}
 			
-			start = new PuzzleState(height, width, redPositions, yellowPositions, lines);
-			end = new PuzzleState(height, width, redPositions, yellowPositions, lines);
+			start = buildStartState(height, width, redPositions, yellowPositions, lines);
+			end = buildEndState(height, width); 
 		}
 
 		return new Puzzle(start, end);
