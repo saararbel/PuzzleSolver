@@ -8,11 +8,27 @@ public class PuzzleState {
 	private int[][] boardColors;
 	private int blankLocationX;
 	private int blankLocationY;
+	private PuzzleState father;
+	// How did the father gets to the child (the move) 
+	private String actionFromFather;
+	private double actionCostFromFather;
+	
+	public static final String EMPTY_ACTION = "";
 	
 	public static final int WHITE = 1;
 	public static final int RED= 2;
 	public static final int YELLOW = 3;
+	
+	public static final double WHITE_COST = 1.0;
+	public static final double YELLOW_COST = 0.5;
+	public static final double RED_COST = 2.0;
 			
+	public PuzzleState(int[][] boardValues, int[][] boardColors, PuzzleState father, String actionFromFather,double actionCostFromFather) {
+		this(boardValues, boardColors);
+		this.father = father;
+		this.actionFromFather = actionFromFather;
+		this.actionCostFromFather = actionCostFromFather;
+	}
 	
 	public PuzzleState(int[][] boardValues, int[][] boardColors) {
 		this.boardColors = boardColors;
@@ -28,26 +44,53 @@ public class PuzzleState {
 		}
 	}
 	
-	public List<String> getPossibleActions() {
-		List<String> possibleActions = new ArrayList<>();
-		// UP
-		if(blankLocationX - 1 >= 0) {
-			possibleActions.add("UP");
-		}
-		
-		//DOWN
-		if(blankLocationX + 1 <= boardValues.length-1) {
-			possibleActions.add("DOWN");
-		}
+	public String getActionFromFather() {
+		return actionFromFather;
+	}
+
+	public double getActionCostFromFather() {
+		return actionCostFromFather;
+	}
+
+	public PuzzleState getFather() {
+		return father;
+	}
+
+	public int[][] getBoardValues() {
+		return boardValues;
+	}
+
+	public void setBoardValues(int[][] boardValues) {
+		this.boardValues = boardValues;
+	}
+
+
+
+	public String[] getPossibleActions() {
+		String[] possibleActions = new String[4];
+		possibleActions[0] = EMPTY_ACTION;
+		possibleActions[1] = EMPTY_ACTION;
+		possibleActions[2] = EMPTY_ACTION;
+		possibleActions[3] = EMPTY_ACTION;
 		
 		// RIGHT
 		if(blankLocationY + 1 <= boardValues[0].length-1) {
-			possibleActions.add("RIGHT");
+			possibleActions[0] = "RIGHT";
+		}
+		
+		// DOWN
+		if(blankLocationX + 1 <= boardValues.length-1) {
+			possibleActions[1] = "DOWN";
 		}
 		
 		// LEFT
 		if(blankLocationY - 1 >= 0) {
-			possibleActions.add("LEFT");
+			possibleActions[2] = "LEFT";
+		}
+		
+		// UP
+		if(blankLocationX - 1 >= 0) {
+			possibleActions[3] = "UP";
 		}
 		
 		return possibleActions;
@@ -100,7 +143,18 @@ public class PuzzleState {
 			swap(newBoardColors, blankLocationX, blankLocationY, blankLocationX , blankLocationY - 1);
 		}
 		
-		return new PuzzleState(newBoardValues, newBoardColors);
+		double cost;
+		if(newBoardColors[blankLocationX][blankLocationY] == WHITE) {
+			cost = WHITE_COST;
+		}
+		else if(newBoardColors[blankLocationX][blankLocationY] == YELLOW) {
+			cost = YELLOW_COST;
+		}
+		else {
+			cost = RED_COST;
+		}
+		
+		return new PuzzleState(newBoardValues, newBoardColors, this, action, cost);
 	}
 
 	@Override

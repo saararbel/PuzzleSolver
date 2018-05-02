@@ -16,9 +16,22 @@ public class Puzzle {
 	public PuzzleState getEndState() {
 		return endState;
 	}
+	
+	
 
 	public boolean isEndState(PuzzleState tempState) {
-		return tempState.equals(startState);
+		int[][] tempBoardValues = tempState.getBoardValues();
+		int[][] endBoardValues = endState.getBoardValues();
+		
+		for(int i=0 ; i< endBoardValues.length ; i++) {
+			for(int j=0 ; j<endBoardValues[0].length ; j++) {
+				if(endBoardValues[i][j] != tempBoardValues[i][j]) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 }
