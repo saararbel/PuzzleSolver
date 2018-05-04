@@ -15,7 +15,7 @@ public class Main {
 		Puzzle puzzle = new PuzzleBuilder().parseInputFile();
 		PuzzleSolver puzzleSolver = new PuzzleSolver();
 		
-		Optional<SolutionData> solution = puzzleSolver.aStar(puzzle);
+		Optional<SolutionData> solution = puzzleSolver.dfid(puzzle);
 		if(solution.isPresent()) {
 			puzzleSolver.printSolution(solution.get().getEndState(), solution.get().getNumPopedFromOpenList());
 		}

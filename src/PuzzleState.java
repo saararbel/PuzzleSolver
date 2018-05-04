@@ -161,11 +161,19 @@ public class PuzzleState {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(actionCostFromFather);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((actionFromFather == null) ? 0 : actionFromFather.hashCode());
+		result = prime * result + blankLocationX;
+		result = prime * result + blankLocationY;
 		result = prime * result + Arrays.deepHashCode(boardColors);
 		result = prime * result + Arrays.deepHashCode(boardValues);
+		result = prime * result + ((father == null) ? 0 : father.hashCode());
 		return result;
 	}
 
+	
 
 	@Override
 	public boolean equals(Object obj) {
@@ -176,9 +184,25 @@ public class PuzzleState {
 		if (getClass() != obj.getClass())
 			return false;
 		PuzzleState other = (PuzzleState) obj;
+		if (Double.doubleToLongBits(actionCostFromFather) != Double.doubleToLongBits(other.actionCostFromFather))
+			return false;
+		if (actionFromFather == null) {
+			if (other.actionFromFather != null)
+				return false;
+		} else if (!actionFromFather.equals(other.actionFromFather))
+			return false;
+		if (blankLocationX != other.blankLocationX)
+			return false;
+		if (blankLocationY != other.blankLocationY)
+			return false;
 		if (!Arrays.deepEquals(boardColors, other.boardColors))
 			return false;
 		if (!Arrays.deepEquals(boardValues, other.boardValues))
+			return false;
+		if (father == null) {
+			if (other.father != null)
+				return false;
+		} else if (!father.equals(other.father))
 			return false;
 		return true;
 	}

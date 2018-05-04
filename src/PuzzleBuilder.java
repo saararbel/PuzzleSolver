@@ -39,10 +39,10 @@ public class PuzzleBuilder {
 		
 		for(int i=0 ; i<height; i++) {
 			for(int j=0 ; j<width; j++) {
-				if(searchInPositions(redPositions, i*width + j + 1)) {
+				if(searchInPositions(redPositions, boardValues[i][j])) {
 					boardColors[i][j] = PuzzleState.RED;
 				}
-				else if(searchInPositions(yellowPositions, i*width + j + 1)) {
+				else if(searchInPositions(yellowPositions, boardValues[i][j])) {
 					boardColors[i][j] = PuzzleState.YELLOW;
 				} 
 				else {
