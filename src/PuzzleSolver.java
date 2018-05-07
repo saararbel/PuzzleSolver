@@ -220,7 +220,7 @@ public class PuzzleSolver {
 			
 			bound = t;
 		}
-	}
+	} 
 	
 	private double[] idaStarSearch(Stack<PuzzleState> path, double gScore, double bound, Puzzle puzzle, double numPopedFromOpenList) {
 		PuzzleState node = path.peek();
