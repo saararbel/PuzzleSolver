@@ -1,14 +1,35 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
+import java.util.Stack;
 
-public class Main {
+public class Ex1 {
 	
-	public static void p(int cell) {
-		int columns = 4;
-		int realCellRow = ((double)cell/columns) > (double)(cell/columns) ? cell/columns : (cell/columns) - 1;
-		int realCellColumn = (cell % columns) == 0 ? columns - 1 : (cell % columns)  - 1;
+	public static void writeOutputFile(PuzzleState state, int numPopedFromOpenList) throws FileNotFoundException, UnsupportedEncodingException {
+		double cost = 0.0;
+		Stack<String> solution = new Stack<>();
+		while(state.getFather() != null) {
+			cost += state.getActionCostFromFather();
+			solution.push(state.getActionFromFather());
+			state = state.getFather();
+		}
 		
-		System.out.println("cell " + cell + " position is: (" + realCellRow + "," + realCellColumn + ")");
+		PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
+		
+		while(!solution.isEmpty()) {
+			String move = solution.pop().substring(0, 1);
+			if(solution.isEmpty()) {
+				writer.print(move);
+			} else {
+				writer.print(move + "-");
+			}
+		}
+		
+		writer.println("\nNum: " + numPopedFromOpenList);
+		writer.print("Cost: " + cost);
+		writer.close();
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -17,10 +38,10 @@ public class Main {
 		
 		Optional<SolutionData> solution = puzzleSolver.dfid(puzzle);
 		if(solution.isPresent()) {
-			puzzleSolver.printSolution(solution.get().getEndState(), solution.get().getNumPopedFromOpenList());
+			writeOutputFile(solution.get().getEndState(), solution.get().getNumPopedFromOpenList());
 		}
-//		for(int i=1 ; i<=11 ; i++) {
-//			p(i);			
-//		}
+		else {
+			System.out.println("There is no solution");
+		}
 	}
 }
