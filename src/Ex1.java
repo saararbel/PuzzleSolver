@@ -32,16 +32,36 @@ public class Ex1 {
 		writer.close();
 	}
 	
+	public static void writeNoSolutionOutputFile() throws FileNotFoundException, UnsupportedEncodingException {
+		PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
+		writer.println("There is no solution");
+		writer.close();
+	}
+	
 	public static void main(String[] args) throws IOException {
-		Puzzle puzzle = new PuzzleBuilder().parseInputFile();
+		PuzzleBuilder builder = new PuzzleBuilder();
+		Puzzle puzzle = builder.parseInputFile();
 		PuzzleSolver puzzleSolver = new PuzzleSolver();
 		
-		Optional<SolutionData> solution = puzzleSolver.dfbnb(puzzle);
+		String algoType = builder.getAlgorithmType().trim();
+		Optional<SolutionData> solution = Optional.empty();
+		if(algoType.equals("1")) {
+			solution = puzzleSolver.bfs(puzzle);
+		} else if(algoType.equals("2")) {
+			solution = puzzleSolver.dfid(puzzle);
+		} else if(algoType.equals("3")) {
+			solution = puzzleSolver.aStar(puzzle);
+		} else if(algoType.equals("4")) {
+			solution = puzzleSolver.idaStar(puzzle);
+		} else if(algoType.equals("5")) {
+			solution = puzzleSolver.dfbnb(puzzle);
+		} 
+		
 		if(solution.isPresent()) {
 			writeOutputFile(solution.get().getEndState(), solution.get().getNumPopedFromOpenList());
 		}
 		else {
-			System.out.println("There is no solution");
+			writeNoSolutionOutputFile();
 		}
 	}
 }

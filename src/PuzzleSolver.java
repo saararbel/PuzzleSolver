@@ -11,6 +11,11 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
+/**
+ * This class contains all the solver algorithms
+ * @author saar
+ *
+ */
 public class PuzzleSolver {
 	
 	public static final int MAX_DFID_DEPTH = 10;
@@ -19,6 +24,9 @@ public class PuzzleSolver {
 	 */
 	private static final double FOUND_SOLUTION = -1.0;
 	
+	/**
+	 * Comparator for PuzzleState (compare the F-score)
+	 */
 	private Comparator<PuzzleState> puzzleStateComparator = new Comparator<PuzzleState>() {
 
 		@Override
@@ -35,7 +43,11 @@ public class PuzzleSolver {
 	
 	public PuzzleSolver() {}
 	
-	
+	/***
+	 * This function is the BFS algorithm
+	 * @param puzzle
+	 * @return
+	 */
 	public Optional<SolutionData> bfs(Puzzle puzzle) {
 		Set<PuzzleState> closedList = new HashSet<>();
 		Queue<PuzzleState> openList = new LinkedList<>();
@@ -66,6 +78,12 @@ public class PuzzleSolver {
 		return Optional.empty();
 	}
 	
+	
+	/***
+	 * Calcs the heuristic function
+	 * @param state
+	 * @return
+	 */
 	private double calcFn(PuzzleState state) {
 		return gn(state) + hn(state);
 	}
@@ -122,6 +140,11 @@ public class PuzzleSolver {
 		return dist;
 	}
 
+	/***
+	 * This function is the aStar algorithm
+	 * @param puzzle
+	 * @return
+	 */
 	public Optional<SolutionData> aStar(Puzzle puzzle) {
 		int numPopedFromOpenList = 0;
 		Set<PuzzleState> closedList = new HashSet<>();
@@ -165,6 +188,12 @@ public class PuzzleSolver {
 		return Optional.empty();
 	}
 	
+	/***
+	 * This function is the dfs algorithm (for the dfid)
+	 * @param puzzle
+	 * @return
+	 */
+	
 	public Optional<SolutionData> dfs(PuzzleState state,PuzzleState endState, int depth, int numPopedFromOpenList) {
 		if(depth == 0) {
 			if(Arrays.deepEquals(endState.getBoardValues(),state.getBoardValues())) {
@@ -192,6 +221,12 @@ public class PuzzleSolver {
 		return childRes;
 	}
 	
+	
+	/***
+	 * This function is the dfid algorithm
+	 * @param puzzle
+	 * @return
+	 */
 	public Optional<SolutionData> dfid(Puzzle puzzle) {
 		int numPopedFromOpenList = 0;
 		for(int i=0 ; i<MAX_DFID_DEPTH ; i++) {
@@ -203,6 +238,12 @@ public class PuzzleSolver {
 		
 		return Optional.empty();
 	}
+	
+	/***
+	 * This function is the idsStar algorithm
+	 * @param puzzle
+	 * @return
+	 */
 	
 	public Optional<SolutionData> idaStar(Puzzle puzzle) {
 		double bound = hn(puzzle.getStartState());
@@ -225,6 +266,11 @@ public class PuzzleSolver {
 		}
 	} 
 	
+	/***
+	 * This function is the idsSearch for the idsStar algorithm
+	 * @param puzzle
+	 * @return
+	 */
 	private double[] idaStarSearch(Stack<PuzzleState> path, double gScore, double bound, Puzzle puzzle, double numPopedFromOpenList) {
 		PuzzleState node = path.peek();
 		double fScore = gScore + hn(node);
@@ -261,6 +307,12 @@ public class PuzzleSolver {
 		return new double[]{min,numPopedFromOpenList};
 	}
 	
+	/***
+	 * This function search if the searchState is in the past path of srcState
+	 * @param srcState
+	 * @param serachState
+	 * @return
+	 */
 	private boolean isInPast(PuzzleState srcState, PuzzleState serachState) {
 		while(srcState.getFather() != null) {
 			if(srcState.getFather().equals(serachState)) {
@@ -273,7 +325,11 @@ public class PuzzleSolver {
 		return false;
 	}
 	
-	
+	/***
+	 * This function is the dfbnb algorithm
+	 * @param puzzle
+	 * @return
+	 */
 	public Optional<SolutionData> dfbnb(Puzzle puzzle) {
 		Stack<PuzzleState> basePath = new Stack<>();
 		double bound = Double.MAX_VALUE;
@@ -289,6 +345,11 @@ public class PuzzleSolver {
 		return Optional.empty();
 	}
 
+	/***
+	 * This function is the branchSearch method for help util the dfbnb algorithm 
+	 * @param puzzle
+	 * @return
+	 */
 	private Optional<SolutionData> solveBranch(Stack<PuzzleState> bestPath, double bound,Puzzle puzzle, int numPopedFromOpenList) {
 		PuzzleState node = bestPath.peek();
 		if(gn(node) + hn(node) < bound) {

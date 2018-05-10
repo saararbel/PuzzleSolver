@@ -71,7 +71,10 @@ public class PuzzleState {
 	}
 
 
-
+	/**
+	 * calcs the possible actions by the order of the targil: Right,Down,Left, up
+	 * @return
+	 */
 	public String[] getPossibleActions() {
 		String[] possibleActions = new String[4];
 		possibleActions[0] = EMPTY_ACTION;

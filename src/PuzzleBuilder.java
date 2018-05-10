@@ -9,6 +9,8 @@ import java.util.List;
 
 public class PuzzleBuilder {
 
+	private String algorithmType;
+	
 	public PuzzleBuilder() {
 	}
 	
@@ -70,13 +72,17 @@ public class PuzzleBuilder {
 		
 		return new PuzzleState(boardValues, null);
 	}
+	
+	public String getAlgorithmType() {
+		return algorithmType;
+	}
 
 	public Puzzle parseInputFile() throws FileNotFoundException, IOException {
 		URL url = getClass().getResource("input.txt");
 		PuzzleState start, end;
 		try (BufferedReader input = new BufferedReader(new FileReader(new File(url.getPath())))) {
 			// algorithm type
-			String algorithm = input.readLine();
+			this.algorithmType = input.readLine();
 
 			// board size
 			String dim = input.readLine();
