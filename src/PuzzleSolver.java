@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -13,14 +14,26 @@ import java.util.Stack;
 public class PuzzleSolver {
 	
 	public static final int MAX_DFID_DEPTH = 10;
-	
 	/**
 	 * Symbol for solution found in IDA* (because there cannot be a negative value for cost)
 	 */
 	private static final double FOUND_SOLUTION = -1.0;
 	
-	public PuzzleSolver() {}
+	private Comparator<PuzzleState> puzzleStateComparator = new Comparator<PuzzleState>() {
+
+		@Override
+		public int compare(PuzzleState state0, PuzzleState state1) {
+			if(calcFn(state0) - calcFn(state1) == 0.0) {
+				return 0;
+			} 
+			if(calcFn(state0) - calcFn(state1) > 0.0) {
+				return 1;
+			}
+			return -1;
+		}
+	};
 	
+	public PuzzleSolver() {}
 	
 	
 	public Optional<SolutionData> bfs(Puzzle puzzle) {
@@ -74,14 +87,16 @@ public class PuzzleSolver {
 
 	/**
 	 * This function calcs the estimated distance from state to endState - 
-	 * The function calcs the 
+	 * The function calcs the manhetan distance between each cell in the current state to the same cell in the endState and multiply
+	 * it by his color weight (because this cell should move the manhaten size steps and each one cost the color on the cell)
 	 * @param endState
 	 * @param state
 	 * @return
 	 */
-	private int hn(PuzzleState state) {
-		int dist = 0;
+	private double hn(PuzzleState state) {
+		double dist = 0.0;
 		int[][] stateBoardValues = state.getBoardValues();
+		int[][] stateBoardColors = state.getBoardColors();
 		int rows = stateBoardValues.length;
 		int columns = stateBoardValues[0].length;
 		
@@ -99,7 +114,7 @@ public class PuzzleSolver {
 					int realCellRow = ((double)cell/columns) > (double)(cell/columns) ? cell/columns : (cell/columns) - 1;
 					int realCellColumn = (cell % columns) == 0 ? columns - 1 : (cell % columns)  - 1;
 					
-					dist += Math.abs(i-realCellRow) + Math.abs(j-realCellColumn);
+					dist += ((Math.abs(i-realCellRow) + Math.abs(j-realCellColumn)) * stateBoardColors[i][j]);
 				}
 			}
 		}
@@ -110,19 +125,7 @@ public class PuzzleSolver {
 	public Optional<SolutionData> aStar(Puzzle puzzle) {
 		int numPopedFromOpenList = 0;
 		Set<PuzzleState> closedList = new HashSet<>();
-		Queue<PuzzleState> openList = new PriorityQueue<>(new Comparator<PuzzleState>() {
-
-			@Override
-			public int compare(PuzzleState state0, PuzzleState state1) {
-				if(calcFn(state0) - calcFn(state1) == 0.0) {
-					return 0;
-				} 
-				if(calcFn(state0) - calcFn(state1) > 0.0) {
-					return 1;
-				}
-				return -1;
-			}
-		});
+		Queue<PuzzleState> openList = new PriorityQueue<>(puzzleStateComparator);
 		Map<PuzzleState, Double> gScore = new HashMap<>();
 		Map<PuzzleState, Double> fScore = new HashMap<>();
 		gScore.put(puzzle.getStartState(), 0.0);
@@ -257,4 +260,63 @@ public class PuzzleSolver {
 		
 		return new double[]{min,numPopedFromOpenList};
 	}
+	
+	private boolean isInPast(PuzzleState srcState, PuzzleState serachState) {
+		while(srcState.getFather() != null) {
+			if(srcState.getFather().equals(serachState)) {
+				return true;
+			}
+			
+			srcState = srcState.getFather();
+		}
+		
+		return false;
+	}
+	
+	
+	public Optional<SolutionData> dfbnb(Puzzle puzzle) {
+		Stack<PuzzleState> basePath = new Stack<>();
+		double bound = Double.MAX_VALUE;
+		int numPopedFromOpenList = 0;
+		basePath.push(puzzle.getStartState());
+		
+		
+		Optional<SolutionData> res = solveBranch(basePath, bound, puzzle, numPopedFromOpenList);
+		if(res.isPresent()) {
+			return res;
+		}
+		
+		return Optional.empty();
+	}
+
+	private Optional<SolutionData> solveBranch(Stack<PuzzleState> bestPath, double bound,Puzzle puzzle, int numPopedFromOpenList) {
+		PuzzleState node = bestPath.peek();
+		if(gn(node) + hn(node) < bound) {
+			if(puzzle.isEndState(node)) {
+				
+				return Optional.of(new SolutionData(node, numPopedFromOpenList));
+			}
+			
+			String[] possibleActions = node.getPossibleActions();
+			PriorityQueue<PuzzleState> childs = new PriorityQueue<>(this.puzzleStateComparator);
+			for(int i=0 ; i<4 ; i++) {
+				if(!possibleActions[i].equals(PuzzleState.EMPTY_ACTION)) {
+					PuzzleState tempState = node.preformAction(possibleActions[i]);
+					if(!isInPast(node, tempState)) {
+						childs.add(tempState);
+					}
+				}
+			}
+			while(!childs.isEmpty()) {
+				bestPath.push(childs.poll());
+				Optional<SolutionData> res = solveBranch(bestPath, bound, puzzle, ++numPopedFromOpenList);
+				if(res.isPresent()) {
+					return res;
+				}
+			}
+			
+		}
+		
+		return Optional.empty();
+    }
 }

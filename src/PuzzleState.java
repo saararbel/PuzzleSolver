@@ -44,6 +44,12 @@ public class PuzzleState {
 		}
 	}
 	
+	
+	
+	public int[][] getBoardColors() {
+		return boardColors;
+	}
+
 	public String getActionFromFather() {
 		return actionFromFather;
 	}
@@ -182,5 +188,22 @@ public class PuzzleState {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		String rep = "";
+		for(int i=0; i<boardValues.length ; i++) {
+			for(int j=0; j<boardValues[0].length ; j++) {
+				rep = rep + boardValues[i][j] + " ";
+				if(boardValues[i][j] < 10) {
+					rep += " ";
+				}
+			}
+			rep += "\n";
+		}
+		
+		return rep;
+	}
+	
+	
 	
 }

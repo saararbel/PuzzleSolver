@@ -36,7 +36,7 @@ public class Ex1 {
 		Puzzle puzzle = new PuzzleBuilder().parseInputFile();
 		PuzzleSolver puzzleSolver = new PuzzleSolver();
 		
-		Optional<SolutionData> solution = puzzleSolver.dfid(puzzle);
+		Optional<SolutionData> solution = puzzleSolver.dfbnb(puzzle);
 		if(solution.isPresent()) {
 			writeOutputFile(solution.get().getEndState(), solution.get().getNumPopedFromOpenList());
 		}
